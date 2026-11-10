@@ -14,6 +14,7 @@ def test_pipeline(tmp_path):
     """Every script end to end on exo6, with tiny budgets."""
     run("simulate.py", "--describe", cwd=tmp_path)
     run("simulate.py", "--n", "10", cwd=tmp_path)
+    run("simulate.py", "--plot", "parameters.png", cwd=tmp_path)
     run("simulate.py", "--theta", "1300", "4", "0.5", "0.8", "0", "1.2", "--out", "obs.npz", cwd=tmp_path)
     run("npe.py", "--sims", "1000", "--epochs", "2", "--n-is", "300", cwd=tmp_path)
     run("tsnpe.py", "--rounds", "2", "--sims", "500", "--epochs", "2", "--n-is", "300", "--K", "8", cwd=tmp_path)

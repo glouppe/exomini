@@ -2,8 +2,10 @@
 
 [![tests](https://github.com/glouppe/exomini/actions/workflows/tests.yml/badge.svg)](https://github.com/glouppe/exomini/actions/workflows/tests.yml)
 
-Simulation-based inference on toy exoplanet emission spectra. It provides three forward models (6, 30 and 50
-parameters) with exact likelihoods, and three inference methods:
+Point a telescope at a made-up planet, get a noisy spectrum, and work out what the planet is made of.
+
+exomini does simulation-based inference on toy exoplanet emission spectra. It provides three forward models (6, 30
+and 50 parameters) with exact likelihoods, and three inference methods:
 - **NPE**: amortised neural posterior estimation.
 - **TSNPE**: truncated sequential NPE.
 - **Nested sampling**: the likelihood-based reference.
@@ -37,7 +39,7 @@ python compare.py --model exo6   # corner.png, ppc.png, table.md
 
 Results go to `runs/exo6/`.
 
-## Models and priors
+## Meet the planets
 
 A model maps parameters θ to the spectrum a telescope would see:
 
@@ -49,6 +51,11 @@ The three models are the same kind of planet at increasing levels of detail.
 temperature profile. The overall metallicity and the carbon-to-oxygen ratio set the abundances of H2O, CH4 and
 CO. The remaining parameters are a cloud-top pressure, the surface gravity and the radius. The parameters are
 well constrained, so this model is quick to explore.
+
+![what each exo6 parameter does](results/exo6/parameters.png)
+
+Each panel sweeps one parameter over its prior, the others fixed at θ\*. Draw it for any model with
+`python simulate.py --model exo30 --plot parameters.png`.
 
 **`exo30`** has 30 parameters and few assumptions, like a "free" retrieval:
 - Temperature: free at 10 altitudes.
@@ -105,6 +112,7 @@ m.log_likelihood(theta, x)       # exact
 python simulate.py --model exo50 --describe                  # parameter table
 python simulate.py --model exo6 --n 10000 --out data.npz     # pairs from the prior
 python simulate.py --model exo6 --theta 1300 4 0.5 0.8 0 1.2 --out obs.npz
+python simulate.py --model exo6 --plot parameters.png        # what each parameter does
 ```
 
 By default every method conditions on test pair 0. Choose another with `--obs 3`, or your own with
@@ -143,8 +151,8 @@ Each method run on the benchmark observation (test pair 0) with its default sett
 | posterior | simulations | ESS | log Z | median χ² | mean shift (σ) | width ratio |
 |---|---|---|---|---|---|---|
 | nested | 483,205 | – | -12.11 ± 0.35 | 73 | – | – |
-| npe: q | 100,000 | – | – | 77 | 0.31 | 1.14 |
-| npe: q + IS | 100,000 | 3,523 | -11.85 | 74 | 0.03 | 0.99 |
+| npe: q | 100,000 | – | – | 78 | 0.31 | 1.14 |
+| npe: q + IS | 100,000 | 3,523 | -11.85 | 73 | 0.03 | 0.99 |
 | tsnpe: q | 100,000 | – | – | 73 | 0.06 | 0.99 |
 | tsnpe: q + IS | 100,000 | 15,867 | -11.86 | 73 | 0.02 | 1.00 |
 
@@ -168,6 +176,15 @@ On our cluster:
 
 The methods are independent, so they can run in parallel. GPU training is not bit-for-bit reproducible: expect
 small differences.
+
+## Things to try
+
+- **Beat TSNPE.** Match its ESS on exo6 with fewer simulations (`--rounds`, `--sims`).
+- **Leave the prior.** Make an observation outside the prior box with `simulate.py --theta`, condition NPE on it
+  with `--obs`, and watch the ESS.
+- **Go big.** Run the three methods on exo50. Which parameters does the spectrum pin down, and which does it
+  barely touch?
+- **Trust no one.** Rerun nested sampling with a different `--seed` or more `--nlive`. How much does log Z move?
 
 ## Layout
 
