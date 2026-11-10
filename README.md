@@ -1,7 +1,5 @@
 # exomini
 
-[![tests](https://github.com/glouppe/exomini/actions/workflows/tests.yml/badge.svg)](https://github.com/glouppe/exomini/actions/workflows/tests.yml)
-
 Point a telescope at a made-up planet, get a noisy spectrum, and work out what the planet is made of.
 
 exomini does simulation-based inference on toy exoplanet emission spectra. It provides three forward models (6, 30
