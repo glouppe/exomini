@@ -1,5 +1,5 @@
 [project]
-name = "toysbi"
+name = "exomini"
 version = "0.1.0"
 description = "Simulation-based inference on toy exoplanet emission spectra"
 requires-python = ">=3.10"
@@ -13,8 +13,8 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["toysbi"]
-package-data = {toysbi = ["data/*.npz"]}
+packages = ["exomini"]
+package-data = {exomini = ["data/*.npz"]}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

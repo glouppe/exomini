@@ -9,8 +9,8 @@ import time
 
 import torch
 
-from toysbi import runs
-from toysbi.inference import NPE, fit, importance_sampling
+from exomini import runs
+from exomini.inference import NPE, fit, importance_sampling
 
 
 def main():

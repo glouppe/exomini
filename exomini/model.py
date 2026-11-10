@@ -1,6 +1,6 @@
 r"""A forward model with its prior, noise model and benchmark observation.
 
-    >>> from toysbi import Model
+    >>> from exomini import Model
     >>> m = Model("exo6")
     >>> theta = m.sample_prior(1000, seed=0)  # (1000, 6), uniform on [m.lower, m.upper]
     >>> x = m.simulate(theta, seed=0)         # (1000, 94), noisy spectra
@@ -30,7 +30,7 @@ class Model:
         if name not in MODELS:
             raise ValueError(f"unknown model {name!r}, expected one of {MODELS}")
         self.name = name
-        self.module = importlib.import_module(f"toysbi.{name}")
+        self.module = importlib.import_module(f"exomini.{name}")
         names, lower, upper, star, units, descriptions = zip(*self.module.PARAMETERS)
         self.names, self.units, self.descriptions = list(names), list(units), list(descriptions)
         self.lower, self.upper, self.theta_star = np.array(lower), np.array(upper), np.array(star)

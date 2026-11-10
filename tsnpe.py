@@ -17,8 +17,8 @@ import time
 import numpy as np
 import torch
 
-from toysbi import runs
-from toysbi.inference import NPE, fit, importance_sampling, truncated_prior
+from exomini import runs
+from exomini.inference import NPE, fit, importance_sampling, truncated_prior
 
 
 def main():

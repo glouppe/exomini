@@ -11,7 +11,7 @@ import argparse
 
 import numpy as np
 
-from toysbi import MODELS, Model
+from exomini import MODELS, Model
 
 
 def main():

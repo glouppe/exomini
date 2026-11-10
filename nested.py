@@ -18,7 +18,7 @@ import dynesty
 import numpy as np
 import torch
 
-from toysbi import Model, runs
+from exomini import Model, runs
 
 _model, _x = None, None
 

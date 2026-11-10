@@ -1,4 +1,4 @@
-# toysbi
+# exomini
 
 Simulation-based inference on toy exoplanet emission spectra. It provides three forward models (6, 30 and 50
 parameters) with exact likelihoods, and three inference methods:
@@ -72,7 +72,7 @@ About half the parameters are constrained.
 [PARAMETERS.md](PARAMETERS.md).** For a single model, run `python simulate.py --model exo50 --describe`.
 
 **Priors** are uniform between a lower and an upper bound. They are set in the `PARAMETERS` table at the top of
-`toysbi/exo6.py`, `exo30.py` and `exo50.py`, one row per parameter. To change a prior, edit its bounds:
+`exomini/exo6.py`, `exo30.py` and `exo50.py`, one row per parameter. To change a prior, edit its bounds:
 
 ```python
 # name, prior lower, prior upper, benchmark θ*, unit, description
@@ -84,7 +84,7 @@ About half the parameters are constrained.
 ## Data
 
 ```python
-from toysbi import Model
+from exomini import Model
 
 m = Model("exo30")
 theta = m.sample_prior(1000, seed=0)
@@ -165,12 +165,12 @@ small differences.
 
 | | |
 |---|---|
-| `toysbi/exo6.py`, `exo30.py`, `exo50.py` | models: `PARAMETERS`, grids, batched `flux(θ)` in torch |
-| `toysbi/physics.py` | radiative transfer, opacity bands, binning |
-| `toysbi/model.py` | `Model`: prior, simulation, likelihood, test pairs |
-| `toysbi/inference.py` | `NPE`, `fit`, `importance_sampling`, `truncated_prior` |
-| `toysbi/runs.py` | run folders, shared script options |
-| `toysbi/data/` | the test pairs (`tests/make_test_pairs.py`) |
+| `exomini/exo6.py`, `exo30.py`, `exo50.py` | models: `PARAMETERS`, grids, batched `flux(θ)` in torch |
+| `exomini/physics.py` | radiative transfer, opacity bands, binning |
+| `exomini/model.py` | `Model`: prior, simulation, likelihood, test pairs |
+| `exomini/inference.py` | `NPE`, `fit`, `importance_sampling`, `truncated_prior` |
+| `exomini/runs.py` | run folders, shared script options |
+| `exomini/data/` | the test pairs (`tests/make_test_pairs.py`) |
 | `*.py` | the scripts; `reproduce.sh` reruns the exo6 example |
 | `results/` | the exo6 example |
 | `tests/` | models, inference, scripts end to end |

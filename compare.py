@@ -22,7 +22,7 @@ import matplotlib.ticker
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-from toysbi import MODELS, Model, runs
+from exomini import MODELS, Model, runs
 
 COLORS = ["#d1495b", "#1f5fae", "#e07b39", "#2a9d8f", "#8e5ea2", "#3a9a5b", "#b07d2b"]
 

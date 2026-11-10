@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from toysbi import Model
-from toysbi.inference import NPE, fit, importance_sampling, truncated_prior
+from exomini import Model
+from exomini.inference import NPE, fit, importance_sampling, truncated_prior
 
 
 @pytest.fixture(scope="module")

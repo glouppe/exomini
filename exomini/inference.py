@@ -2,8 +2,8 @@ r"""Neural posterior estimation, truncated proposals and importance sampling.
 
 The estimator works in u = 2 (θ - lower) / (upper - lower) - 1, where the prior is uniform on [-1, 1]^D.
 
-    >>> from toysbi import Model
-    >>> from toysbi.inference import NPE, fit, importance_sampling
+    >>> from exomini import Model
+    >>> from exomini.inference import NPE, fit, importance_sampling
     >>> m = Model("exo6")
     >>> theta = m.sample_prior(10_000, seed=0)
     >>> npe = fit(NPE(m), theta, m.flux(theta))                # fresh noise is drawn at every epoch

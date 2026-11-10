@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import torch
 
-from toysbi import MODELS, Model
+from exomini import MODELS, Model
 
 
 @pytest.fixture(params=MODELS, scope="module")
@@ -68,7 +68,7 @@ def test_documented(model):
 def test_pairs(model):
     """The simulator still reproduces the shipped test pairs; pair 0 is the benchmark observation."""
     theta, x = model.test_pairs()
-    f = np.load(Path(__file__).parents[1] / "toysbi" / "data" / f"{model.name}.npz")["f"]
+    f = np.load(Path(__file__).parents[1] / "exomini" / "data" / f"{model.name}.npz")["f"]
     assert theta.shape == (8, model.D) and x.shape == (8, model.n_bins)
     assert np.allclose(theta[0], model.theta_star) and np.allclose(x[0], model.observation())
     assert np.abs(model.flux(theta, dtype=torch.float64) - f).max() < 1e-6 * model.sigma
