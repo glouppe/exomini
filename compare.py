@@ -18,6 +18,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.ticker
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
@@ -34,7 +35,7 @@ def load_sets(folder: str, names: list, only_is: bool, min_ess: float = 50) -> l
         s = run["summary"]
         if run["q"] is None:  # nested sampling
             n_ref = sum(st["filled"] for st in sets)
-            sets.append(dict(label=f"{name}: {s['method']}", samples=run["samples"], color=["0.55", "0.25"][n_ref % 2],
+            sets.append(dict(label=name, samples=run["samples"], color=["0.55", "0.25"][n_ref % 2],
                              filled=n_ref == 0, ls="-", summary=s, run=run))
             continue
         color, k = COLORS[k % len(COLORS)], k + 1
@@ -96,6 +97,9 @@ def corner(model: Model, sets: list, idx: list, truth, path: str, bins: int = 40
                     ax.plot(truth[j], truth[i], "k+", ms=6)
                 ax.set_xlim(lo[j], up[j])
                 ax.set_ylim(lo[i], up[i])
+            ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(3, prune="both"))
+            if a != b:
+                ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(3, prune="both"))
             fs = 9 if n <= 15 else 7
             if a == n - 1:
                 ax.set_xlabel(model.names[j], fontsize=fs)
@@ -162,13 +166,14 @@ def ppc(model: Model, sets: list, x_obs: np.ndarray, truth, path: str, n: int = 
 
 
 def table(sets: list, chi2: list, path: str):
-    """Cost, importance-sampling ESS, log Z, fit, and the marginals against the reference (first nested run)."""
+    """Cost, importance-sampling ESS, log Z, fit, and the marginals against the reference (first nested run):
+    mean shift = mean over parameters of |Δ mean| / σ_ref, width ratio = median over parameters of σ / σ_ref."""
     ref = next((s["samples"] for s in sets if s["filled"]), None)
-    rows = ["| posterior | simulations | ESS | log Z | median χ² | mean \\|Δμ\\| / σ_ref | median σ / σ_ref |",
+    rows = ["| posterior | simulations | ESS | log Z | median χ² | mean shift (σ) | width ratio |",
             "|---|---|---|---|---|---|---|"]
     for s, c in zip(sets, chi2):
         su = s["summary"]
-        ess = f"{su['ess']:.0f}" if "ess" in su else "–"
+        ess = f"{su['ess']:,.0f}" if "ess" in su else "–"
         logz = f"{su['logz']:.2f}" + (f" ± {su['logz_err']:.2f}" if "logz_err" in su else "")
         if s["ls"] == "-" and not s["filled"]:
             ess = logz = "–"  # q itself: the ESS and log Z belong to its reweighted version

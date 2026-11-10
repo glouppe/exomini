@@ -6,15 +6,16 @@ parameters) with exact likelihoods, and three inference methods:
 - **TSNPE**: truncated sequential NPE.
 - **Nested sampling**: the likelihood-based reference.
 
-> **Disclaimer.** This codebase was entirely vibe-coded with an AI assistant. The physics is schematic and the code is not
-> validated for real data: do not use it for serious exoplanet science. Its purpose is to demonstrate how to do
-> simulation-based inference (NPE, TSNPE) and nested sampling on a problem shaped like an atmospheric retrieval.
+> **Disclaimer.** This codebase was entirely vibe-coded with an AI assistant. The physics is schematic and the
+> code is not validated on real data: do not use it for serious exoplanet science. Its purpose is to show how
+> to do simulation-based inference (NPE, TSNPE) and nested sampling on a problem shaped like an atmospheric
+> retrieval.
 
 ## Install
 
 ```bash
 pip install -e ".[test]"
-pytest
+pytest            # ~2 min on CPU
 ```
 
 The code runs on CPU and uses a GPU when there is one.
@@ -106,8 +107,8 @@ By default every method conditions on test pair 0. Choose another with `--obs 3`
 - **`npe.py`**: trains q(θ | x) once on prior simulations, then samples q(θ | x_obs).
 - **`tsnpe.py`**: works in rounds. Each round simulates from the prior restricted to where the last
   q(θ | x_obs) puts 1 − 10⁻⁴ of its mass, then retrains on all the simulations so far.
-- **`nested.py`**: dynesty with the exact likelihood. It gives log Z, at one simulation per likelihood
-  evaluation.
+- **`nested.py`**: dynesty (random slice sampling) with the exact likelihood. It gives log Z directly, but
+  each likelihood evaluation is one simulation.
 
 NPE and TSNPE finish with **importance sampling**: q's draws are reweighted by p(x | θ) p(θ) / q(θ | x).
 - **ESS** close to the number of draws means q is accurate; an ESS of a few means q is wrong.
@@ -115,12 +116,13 @@ NPE and TSNPE finish with **importance sampling**: q's draws are reweighted by p
 
 The options shared by all scripts are `--model`, `--obs`, `--seed`, `--out` and `--name`. See `--help`.
 
-## Results
+## Comparing runs
 
 `compare.py` writes three files to `runs/<model>/`:
 - **`corner.png`**: marginals. Nested sampling is grey; for NPE and TSNPE, q is solid and q + IS is dashed.
 - **`ppc.png`**: spectra of posterior draws, and the χ² of x_obs. A good posterior gives χ² ≈ the number of bins.
-- **`table.md`**: simulations used, ESS, log Z, χ², and the distance of the marginals to nested sampling.
+- **`table.md`**: simulations used, ESS, log Z and median χ². It also compares the marginals with nested
+  sampling: the mean shift (in its standard deviations) and the width ratio (1 = same width).
 
 ## Example: exo6
 
@@ -130,13 +132,13 @@ Each method run on the benchmark observation (test pair 0) with its default sett
 
 ![posterior predictive check](results/exo6/ppc.png)
 
-| posterior | simulations | ESS | log Z | median χ² | mean \|Δμ\| / σ_ref | median σ / σ_ref |
+| posterior | simulations | ESS | log Z | median χ² | mean shift (σ) | width ratio |
 |---|---|---|---|---|---|---|
-| nested: nested sampling, 500 live points | 483,205 | – | -12.11 ± 0.35 | 73 | – | – |
+| nested | 483,205 | – | -12.11 ± 0.35 | 73 | – | – |
 | npe: q | 100,000 | – | – | 77 | 0.31 | 1.14 |
-| npe: q + IS | 100,000 | 3523 | -11.85 | 74 | 0.03 | 0.99 |
+| npe: q + IS | 100,000 | 3,523 | -11.85 | 74 | 0.03 | 0.99 |
 | tsnpe: q | 100,000 | – | – | 73 | 0.06 | 0.99 |
-| tsnpe: q + IS | 100,000 | 15867 | -11.86 | 73 | 0.02 | 1.00 |
+| tsnpe: q + IS | 100,000 | 15,867 | -11.86 | 73 | 0.02 | 1.00 |
 
 - **All three agree.** The two log Z estimates from importance sampling are within nested sampling's error bar.
 - **NPE's q is slightly too broad** (1.14 times nested sampling's width). Importance sampling corrects it.
@@ -170,5 +172,5 @@ small differences.
 | `toysbi/runs.py` | run folders, shared script options |
 | `toysbi/data/` | the test pairs (`tests/make_test_pairs.py`) |
 | `*.py` | the scripts; `reproduce.sh` reruns the exo6 example |
-| `results/` | figures of the example |
+| `results/` | the exo6 example |
 | `tests/` | models, inference, scripts end to end |
