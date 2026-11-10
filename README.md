@@ -6,7 +6,7 @@ exomini does simulation-based inference on toy exoplanet emission spectra. It pr
 and 50 parameters) with exact likelihoods, and three inference methods:
 - **NPE**: amortised neural posterior estimation.
 - **TSNPE**: truncated sequential NPE.
-- **Nested sampling**: the likelihood-based reference.
+- **Nested sampling**: classical sampling with the exact likelihood.
 
 > **Disclaimer.** This codebase was entirely vibe-coded with an AI assistant. The physics is schematic and the
 > code is not validated on real data: do not use it for serious exoplanet science. Its purpose is to show how
@@ -133,10 +133,14 @@ The options shared by all scripts are `--model`, `--obs`, `--seed`, `--out` and 
 ## Comparing runs
 
 `compare.py` writes three files to `runs/<model>/`:
-- **`corner.png`**: marginals. Nested sampling is grey; for NPE and TSNPE, q is solid and q + IS is dashed.
+- **`corner.png`**: marginals, one colour per run. For NPE and TSNPE, q is solid and q + IS is dashed.
 - **`ppc.png`**: spectra of posterior draws, and the χ² of x_obs. A good posterior gives χ² ≈ the number of bins.
-- **`table.md`**: simulations used, ESS, log Z and median χ². It also compares the marginals with nested
-  sampling: the mean shift (in its standard deviations) and the width ratio (1 = same width).
+- **`table.md`**: simulations used, ESS, log Z and median χ². It also compares the marginals with those of one
+  run (`--against`, default nested sampling): the mean shift (in that run's standard deviations) and the width
+  ratio (1 = same width).
+
+No method is ground truth, nested sampling included: each has its own error. Agreement between methods that
+work differently is the evidence.
 
 ## Example: exo6
 
@@ -146,17 +150,17 @@ Each method run on the benchmark observation (test pair 0) with its default sett
 
 ![posterior predictive check](results/exo6/ppc.png)
 
-| posterior | simulations | ESS | log Z | median χ² | mean shift (σ) | width ratio |
+| Posterior | Simulations | ESS | log Z | Median χ² | Mean shift vs nested sampling (σ) | Width vs nested sampling |
 |---|---|---|---|---|---|---|
-| nested | 483,205 | – | -12.11 ± 0.35 | 73 | – | – |
-| npe: q | 100,000 | – | – | 78 | 0.31 | 1.14 |
-| npe: q + IS | 100,000 | 3,523 | -11.85 | 73 | 0.03 | 0.99 |
-| tsnpe: q | 100,000 | – | – | 73 | 0.06 | 0.99 |
-| tsnpe: q + IS | 100,000 | 15,867 | -11.86 | 73 | 0.02 | 1.00 |
+| Nested sampling | 483,205 | – | -12.11 ± 0.35 | 73 | – | – |
+| NPE, q | 100,000 | – | – | 78 | 0.31 | 1.14 |
+| NPE, q + IS | 100,000 | 3,523 | -11.85 | 73 | 0.03 | 0.99 |
+| TSNPE, q | 100,000 | – | – | 73 | 0.06 | 0.99 |
+| TSNPE, q + IS | 100,000 | 15,867 | -11.86 | 73 | 0.02 | 1.00 |
 
-- **All three agree.** The two log Z estimates from importance sampling are within nested sampling's error bar.
-- **NPE's q is slightly too broad** (1.14 times nested sampling's width). Importance sampling corrects it.
-- **TSNPE's q is already accurate.** For the same 100k simulations, its ESS is 4.5 times NPE's.
+- **All three agree.** The two log Z estimates from importance sampling fall within nested sampling's error bar.
+- **NPE's q is broader than the rest** (1.14 times nested sampling's width). Importance sampling brings it in line.
+- **TSNPE's q is already close.** For the same 100k simulations, its ESS is 4.5 times NPE's.
 
 To reproduce (GPU optional):
 

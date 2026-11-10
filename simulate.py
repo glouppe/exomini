@@ -39,12 +39,12 @@ def plot_parameters(model: Model, path: str):
             ax.text(0, 1.02, f"{model.lower[i]:g} → {model.upper[i]:g}{unit}", transform=ax.transAxes,
                     va="bottom", fontsize=7.5, color=MUTED)
         for ax in axes[-1]:
-            ax.set_xlabel("wavelength [μm]")
+            ax.set_xlabel("Wavelength [μm]")
         for ax in axes[:, 0]:
-            ax.set_ylabel("flux")
+            ax.set_ylabel("Flux")
         for ax in axes.flat:
             ax.set_ylim(bottom=0)
-        fig.suptitle(f"{model.name}: each parameter swept over its prior, light to dark (dotted: θ*)",
+        fig.suptitle(f"Each {model.name} parameter swept over its prior, light to dark (dotted: θ*)",
                      x=0.01, ha="left", fontsize=12)
         fig.tight_layout(rect=(0, 0, 1, 1 - 0.45 / fig.get_figheight()))
         fig.savefig(path, dpi=90 if model.D > 12 else 110)

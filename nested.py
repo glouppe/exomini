@@ -1,8 +1,9 @@
-r"""Nested sampling (dynesty) with the exact likelihood: the classical reference, and the evidence log Z.
+r"""Nested sampling (dynesty) with the exact likelihood: posterior samples, and the evidence log Z.
 
 One likelihood evaluation is one simulation, done in CPU workers by random slice sampling ("rslice"); dynesty's
-default for few parameters (ellipsoids) keeps the main process busy and the workers idle instead. Not ground
-truth either: it has its own sampling error, and can miss modes. Checkpoints to dynesty.save, and resumes from it.
+default for few parameters (ellipsoids) keeps the main process busy and the workers idle instead. Like the other
+methods, it is not ground truth: it has its own error, and can miss modes. Checkpoints to dynesty.save, and
+resumes from it.
 
     python nested.py --model exo6
     python nested.py --model exo30 --nlive 2000
