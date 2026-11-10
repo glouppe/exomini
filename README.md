@@ -6,6 +6,10 @@ parameters) with exact likelihoods, and three inference methods:
 - **TSNPE**: truncated sequential NPE.
 - **Nested sampling**: the likelihood-based reference.
 
+> **Disclaimer.** This codebase was entirely vibe-coded with an AI assistant. The physics is schematic and the code is not
+> validated for real data: do not use it for serious exoplanet science. Its purpose is to demonstrate how to do
+> simulation-based inference (NPE, TSNPE) and nested sampling on a problem shaped like an atmospheric retrieval.
+
 ## Install
 
 ```bash
