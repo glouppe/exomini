@@ -88,18 +88,6 @@ The options shared by all scripts are `--model`, `--obs`, `--seed`, `--out` and 
 - **`ppc.png`**: spectra of posterior draws, and the χ² of x_obs. A good posterior gives χ² ≈ the number of bins.
 - **`table.md`**: simulations used, ESS, log Z, χ², and the distance of the marginals to nested sampling.
 
-## Findings on exo30, at 1M simulations
-
-```bash
-python npe.py   --model exo30 --sims 1000000
-python tsnpe.py --model exo30 --rounds 5 --sims 200000
-python nested.py --model exo30 --nlive 2000
-```
-
-- **NPE fails**: ESS 1–6 of 50,000, posteriors too broad, χ² ≈ 215 for 176 bins.
-- **TSNPE works**: ESS 2,000–3,600, log Z within 0.1 over four runs, usable from 400k simulations.
-- **Nested sampling is not ground truth**: runs with 1,000 and 2,000 live points differ by 1.0 in log Z.
-
 ## Layout
 
 | | |
