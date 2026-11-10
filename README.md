@@ -122,6 +122,43 @@ The options shared by all scripts are `--model`, `--obs`, `--seed`, `--out` and 
 - **`ppc.png`**: spectra of posterior draws, and the χ² of x_obs. A good posterior gives χ² ≈ the number of bins.
 - **`table.md`**: simulations used, ESS, log Z, χ², and the distance of the marginals to nested sampling.
 
+## Example: exo6
+
+Each method run on the benchmark observation (test pair 0) with its default settings.
+
+![corner plot](results/exo6/corner.png)
+
+![posterior predictive check](results/exo6/ppc.png)
+
+| posterior | simulations | ESS | log Z | median χ² | mean \|Δμ\| / σ_ref | median σ / σ_ref |
+|---|---|---|---|---|---|---|
+| nested: nested sampling, 500 live points | 483,205 | – | -12.11 ± 0.35 | 73 | – | – |
+| npe: q | 100,000 | – | – | 77 | 0.31 | 1.14 |
+| npe: q + IS | 100,000 | 3523 | -11.85 | 74 | 0.03 | 0.99 |
+| tsnpe: q | 100,000 | – | – | 73 | 0.06 | 0.99 |
+| tsnpe: q + IS | 100,000 | 15867 | -11.86 | 73 | 0.02 | 1.00 |
+
+- **All three agree.** The two log Z estimates from importance sampling are within nested sampling's error bar.
+- **NPE's q is slightly too broad** (1.14 times nested sampling's width). Importance sampling corrects it.
+- **TSNPE's q is already accurate.** For the same 100k simulations, its ESS is 4.5 times NPE's.
+
+To reproduce (GPU optional):
+
+```bash
+./reproduce.sh    # npe.py, tsnpe.py, nested.py, compare.py on exo6, then copies the figures to results/exo6/
+```
+
+On our cluster:
+
+| Method | Hardware | Time |
+|---|---|---|
+| NPE | 1 GPU | 16 min |
+| TSNPE | 1 GPU | 46 min |
+| Nested sampling | 32 CPUs | 4 min |
+
+The methods are independent, so they can run in parallel. GPU training is not bit-for-bit reproducible: expect
+small differences.
+
 ## Layout
 
 | | |
@@ -132,5 +169,6 @@ The options shared by all scripts are `--model`, `--obs`, `--seed`, `--out` and 
 | `toysbi/inference.py` | `NPE`, `fit`, `importance_sampling`, `truncated_prior` |
 | `toysbi/runs.py` | run folders, shared script options |
 | `toysbi/data/` | the test pairs (`tests/make_test_pairs.py`) |
-| `*.py` | the scripts |
+| `*.py` | the scripts; `reproduce.sh` reruns the exo6 example |
+| `results/` | figures of the example |
 | `tests/` | models, inference, scripts end to end |

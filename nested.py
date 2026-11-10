@@ -1,7 +1,9 @@
 r"""Nested sampling (dynesty) with the exact likelihood: the classical reference, and the evidence log Z.
 
-One likelihood evaluation is one simulation, on CPU workers. Not ground truth either: on exo30, runs with 1000
-and 2000 live points disagree by 1.0 in log Z. Checkpoints to dynesty.save, and resumes from it.
+One likelihood evaluation is one simulation, done in CPU workers by random slice sampling ("rslice"); dynesty's
+default for few parameters (ellipsoids) keeps the main process busy and the workers idle instead. Not ground
+truth either: on exo30, runs with 1000 and 2000 live points disagree by 1.0 in log Z. Checkpoints to
+dynesty.save, and resumes from it.
 
     python nested.py --model exo6
     python nested.py --model exo30 --nlive 2000
@@ -49,8 +51,6 @@ def main():
     workers = args.workers or (len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count())
     t0 = time.time()
 
-    # Slice sampling scales to many dimensions; with few, dynesty's default (ellipsoids) is faster.
-    method = "rslice" if model.D > 10 else "auto"
     checkpoint = f"{path}/dynesty.save"
     with Pool(workers, initializer=_init, initargs=(model.name, x_obs)) as pool:
         if os.path.exists(checkpoint):
@@ -59,7 +59,7 @@ def main():
                                print_progress=sys.stdout.isatty())
         else:
             sampler = dynesty.NestedSampler(_log_likelihood, _PriorTransform(model.lower, model.upper), model.D,
-                                            nlive=args.nlive, sample=method, pool=pool, queue_size=workers,
+                                            nlive=args.nlive, sample="rslice", pool=pool, queue_size=workers,
                                             rstate=np.random.default_rng(args.seed))
             sampler.run_nested(dlogz=args.dlogz, checkpoint_file=checkpoint, checkpoint_every=600,
                                print_progress=sys.stdout.isatty())
