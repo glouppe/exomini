@@ -32,23 +32,53 @@ Results go to `runs/exo6/`.
 
 ## Models and priors
 
+A model maps parameters θ to the spectrum a telescope would see:
+
+    θ  →  atmosphere (temperature at each altitude, gas abundances, clouds)  →  emitted light  →  binned, plus noise
+
+The three models are the same kind of planet at increasing levels of detail.
+
+**`exo6`** has 6 parameters and a few physical assumptions. One internal temperature sets the whole
+temperature profile. The overall metallicity and the carbon-to-oxygen ratio set the abundances of H2O, CH4 and
+CO. The remaining parameters are a cloud-top pressure, the surface gravity and the radius. The parameters are
+well constrained, so this model is quick to explore.
+
+**`exo30`** has 30 parameters and few assumptions, like a "free" retrieval:
+- Temperature: free at 10 altitudes.
+- Gases: 15 species, each abundance free.
+- Cloud: one deck with free height, thickness and colour.
+- Planet: gravity and radius.
+
+Many parameters are barely constrained by the data, as in practice.
+
+**`exo50`** has 50 parameters, modelled on retrievals of brown dwarfs with petitRADTRANS:
+- Temperature: its slope with altitude, free at 10 altitudes.
+- Main gases: from metallicity and C/O, with mixing frozen above a free pressure, plus the 13C isotope.
+- Trace gases: 20 species, each abundance free.
+- Clouds: silicate and iron, each with a free base, amount, thickness and particle size. They cover a free
+  fraction of the disc, and there is a haze.
+- Instrument: a calibration offset between the two detectors.
+
+About half the parameters are constrained.
+
 | | `exo6` | `exo30` | `exo50` |
 |---|---|---|---|
-| Temperature | grey, from T_int | 10 nodes | 10 nodes (gradients) |
-| Chemistry | [M/H], C/O | 15 free species | [M/H], C/O, quench, 13CO, 20 free species |
-| Clouds | grey deck | deck | MgSiO3 + Fe, patchy; haze |
-| Wavelengths | 0.95–2.45 μm, 94 bins | 0.85–4.95 μm, 176 bins | as `exo30` |
+| Parameters | 6 | 30 | 50 |
+| Wavelengths | 0.95–2.45 μm | 0.85–4.95 μm | 0.85–4.95 μm |
+| Spectral bins (R ≈ 100) | 94 | 176 | 176 |
 
-[PARAMETERS.md](PARAMETERS.md) lists every parameter: its prior, unit, meaning and benchmark value.
+**Every parameter, with its meaning, unit, prior range and benchmark value θ\*, is listed in
+[PARAMETERS.md](PARAMETERS.md).** For a single model, run `python simulate.py --model exo50 --describe`.
 
-Priors are uniform. To change one, edit the `PARAMETERS` table at the top of `toysbi/exo*.py`:
+**Priors** are uniform between a lower and an upper bound. They are set in the `PARAMETERS` table at the top of
+`toysbi/exo6.py`, `exo30.py` and `exo50.py`, one row per parameter. To change a prior, edit its bounds:
 
 ```python
 # name, prior lower, prior upper, benchmark θ*, unit, description
 ("log_g", 3.0, 5.0, 3.75, "log10 cm/s²", "surface gravity"),
 ```
 
-The noise is Gaussian with a fixed σ per bin, giving S/N ≈ 30 at the benchmark's peak.
+**Noise** is Gaussian, with the same σ in every bin: S/N ≈ 30 at the brightest point of the benchmark spectrum.
 
 ## Data
 
