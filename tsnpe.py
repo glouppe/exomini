@@ -11,7 +11,6 @@ pairs still targets the posterior at x_obs (if the region holds all of it). q is
     python tsnpe.py --model exo30 --rounds 5 --sims 200000
 """
 
-import json
 import time
 
 import numpy as np
@@ -49,12 +48,12 @@ def main():
         print(f"  ESS {res['ess']:.0f} of {args.n_is}, log Z {res['logz']:.2f}")
         if r + 1 < args.rounds:
             t1 = time.time()
-            theta, trunc = truncated_prior(npe, x_obs, args.sims, args.eps, args.K)
+            theta, trunc = truncated_prior(npe, x_obs, args.sims, args.eps, args.K, seed=args.seed + r)
             info.update(trunc)
             print(f"  truncated prior: 10^{trunc['log10_volume']:.1f} of the prior volume, "
                   f"{trunc['ess_per_draw']:.1f} effective candidates per draw, {time.time() - t1:.0f} s")
         log.append(info)
-        json.dump(log, open(f"{path}/rounds.json", "w"), indent=1)
+        runs.write_json(f"{path}/rounds.json", log)
 
     runs.save(path, res["samples"], res["q"], method=f"TSNPE, {args.rounds} rounds", n_sims=args.rounds * args.sims,
               ess=res["ess"], logz=res["logz"], q_inside_prior=res["q_inside_prior"], seconds=time.time() - t0)

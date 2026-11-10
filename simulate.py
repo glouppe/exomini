@@ -7,21 +7,18 @@ r"""Use a forward model directly: describe its parameters, simulate a dataset, o
 An observation file can be given to the inference scripts with --obs obs.npz.
 """
 
-import argparse
-
 import numpy as np
 
-from exomini import MODELS, Model
+from exomini import Model, runs
 
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--model", default="exo6", choices=MODELS, help="forward model (default: exo6)")
+    p = runs.parser(__doc__)
     p.add_argument("--describe", action="store_true", help="print the parameters and their priors")
     p.add_argument("--n", type=int, default=1000, help="number of prior draws (default: 1000)")
     p.add_argument("--theta", type=float, nargs="+", help="one parameter vector, in the order of --describe")
     p.add_argument("--seed", type=int, default=0)
-    p.add_argument("--out", default="data.npz")
+    p.add_argument("--out", default="data.npz", help="output file (default: data.npz)")
     args = p.parse_args()
     model = Model(args.model)
 

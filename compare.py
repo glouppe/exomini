@@ -11,7 +11,6 @@ its ESS is below 50, since it then rests on a handful of points.
 Writes corner.png, ppc.png and table.md in runs/<model>/.
 """
 
-import argparse
 import os
 
 import matplotlib
@@ -22,7 +21,7 @@ import matplotlib.ticker
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-from exomini import MODELS, Model, runs
+from exomini import Model, runs
 
 COLORS = ["#d1495b", "#1f5fae", "#e07b39", "#2a9d8f", "#8e5ea2", "#3a9a5b", "#b07d2b"]
 
@@ -183,18 +182,18 @@ def table(sets: list, chi2: list, path: str):
             dm = f"{np.mean(np.abs(s['samples'].mean(0) - ref.mean(0)) / sd):.2f}"
             ds = f"{np.median(s['samples'].std(0) / sd):.2f}"
         rows.append(f"| {s['label']} | {su['n_sims']:,} | {ess} | {logz} | {np.median(c):.0f} | {dm} | {ds} |")
-    open(path, "w").write("\n".join(rows) + "\n")
+    with open(path, "w") as f:
+        f.write("\n".join(rows) + "\n")
     print("\n".join(rows))
 
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--model", default="exo6", choices=MODELS, help="forward model (default: exo6)")
+    p = runs.parser(__doc__)
     p.add_argument("--runs", nargs="+", help="run names in runs/<model>/ (default: all, nested sampling first)")
     p.add_argument("--only-is", action="store_true", help="NPE / TSNPE: draw the reweighted samples only")
     p.add_argument("--params", nargs="+", help="parameters of the corner plot (default: all if at most 12, "
                                                "else the 12 the first posterior constrains most)")
-    p.add_argument("--out", default="runs")
+    p.add_argument("--out", default="runs", help="the runs are in OUT/<model>/ (default: runs)")
     args = p.parse_args()
     model = Model(args.model)
     folder = os.path.join(args.out, args.model)

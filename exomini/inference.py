@@ -68,8 +68,9 @@ def fit(npe: NPE, theta: np.ndarray, f: np.ndarray, epochs: int = 200, patience:
     Each epoch draws new noise, x = f + σ ε: the noise model is known, so this is exact, and it is a free data
     augmentation (each simulation is seen with many noise realisations). The last 5% of the pairs, with one fixed
     noise draw, are held out for early stopping; the best model on them is kept. Statistics in npe.history.
+    Trains on the device of the model (npe.model.device).
     """
-    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    dev = npe.model.device
     torch.manual_seed(seed)
     npe.to(dev)
     sigma = npe.model.sigma
@@ -126,6 +127,7 @@ def importance_sampling(npe: NPE, x: np.ndarray, n: int = 20_000, seed: int = 0)
     q_inside_prior (fraction of q's draws inside the prior box).
     """
     model = npe.model
+    torch.manual_seed(seed)
     theta, log_q = npe.sample(x, n)
     inside = model.in_prior(theta)
     log_w = np.full(n, -np.inf)
@@ -139,7 +141,8 @@ def importance_sampling(npe: NPE, x: np.ndarray, n: int = 20_000, seed: int = 0)
 
 
 @torch.no_grad()
-def truncated_prior(npe: NPE, x: np.ndarray, n: int, eps: float = 1e-4, K: int = 1024) -> tuple[np.ndarray, dict]:
+def truncated_prior(npe: NPE, x: np.ndarray, n: int, eps: float = 1e-4, K: int = 1024,
+                    seed: int = 0) -> tuple[np.ndarray, dict]:
     r"""n draws from the prior truncated to the highest-probability region of q(θ | x) with mass 1 - eps.
 
     The region is {θ : q(θ | x) > τ}, τ the eps-quantile of log q under q. Draws are made by sampling-importance-
@@ -148,8 +151,11 @@ def truncated_prior(npe: NPE, x: np.ndarray, n: int, eps: float = 1e-4, K: int =
 
     Returns the draws and a dict: tau, log10_volume (fraction of the prior volume in the region), and
     ess_per_draw (effective number of candidates per draw: small values mean heavy-tailed weights).
+    The draws are reproducible given the seed (up to GPU non-determinism).
     """
     model = npe.model
+    torch.manual_seed(seed)
+    rng = np.random.default_rng(seed)
     _, lq = npe.sample(x, max(200_000, int(20 / eps)))
     tau = np.quantile(lq, eps)
     log_p = -np.sum(np.log(model.upper - model.lower))  # the uniform prior density
@@ -163,7 +169,6 @@ def truncated_prior(npe: NPE, x: np.ndarray, n: int, eps: float = 1e-4, K: int =
         w = np.exp(log_w[ok] - log_w[ok].max(axis=1, keepdims=True))
         w /= w.sum(axis=1, keepdims=True)
         ess.append(np.mean(1 / (w ** 2).sum(axis=1)))
-        rng = np.random.default_rng(len(out))
         j = (w.cumsum(axis=1) > rng.random((len(w), 1))).argmax(axis=1)
         out.append(theta.reshape(per, K, -1)[ok][np.arange(len(j)), j])
     info = {"tau": float(tau), "log10_volume": float(np.mean(log_vol) / np.log(10)),

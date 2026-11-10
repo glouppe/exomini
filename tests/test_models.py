@@ -60,7 +60,8 @@ def test_likelihood(model):
 
 
 def test_documented(model):
-    """PARAMETERS.md lists every parameter with its prior (regenerate it when a PARAMETERS table changes)."""
+    """PARAMETERS.md lists every parameter with its prior (after changing a PARAMETERS table, run
+    tools/make_parameters_md.py)."""
     doc = (Path(__file__).parents[1] / "PARAMETERS.md").read_text()
     assert model.describe() in doc
 

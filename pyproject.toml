@@ -2,6 +2,8 @@
 name = "exomini"
 version = "0.1.0"
 description = "Simulation-based inference on toy exoplanet emission spectra"
+readme = "README.md"
+license = {text = "BSD-3-Clause"}
 requires-python = ">=3.10"
 dependencies = ["numpy", "scipy", "matplotlib", "torch>=2.1", "zuko>=1.1", "dynesty>=2.1"]
 

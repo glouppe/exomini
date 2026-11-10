@@ -1,6 +1,6 @@
 # Parameters and priors
 
-Generated from the `PARAMETERS` tables in `exomini/exo*.py` (`python simulate.py --model <name> --describe`).
+Generated from the `PARAMETERS` tables in `exomini/exo*.py` by `python tools/make_parameters_md.py`.
 All priors are uniform. θ* is the benchmark parameter vector (test pair 0).
 
 ## exo6

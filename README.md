@@ -1,5 +1,7 @@
 # exomini
 
+[![tests](https://github.com/glouppe/exomini/actions/workflows/tests.yml/badge.svg)](https://github.com/glouppe/exomini/actions/workflows/tests.yml)
+
 Simulation-based inference on toy exoplanet emission spectra. It provides three forward models (6, 30 and 50
 parameters) with exact likelihoods, and three inference methods:
 - **NPE**: amortised neural posterior estimation.
@@ -18,7 +20,11 @@ pip install -e ".[test]"
 pytest            # ~2 min on CPU
 ```
 
-The code runs on CPU and uses a GPU when there is one.
+The code runs on CPU and uses a GPU when there is one. Recent PyTorch wheels dropped older GPUs (GTX 10xx, for
+example): there, install a CUDA 12.6 build first,
+`pip install torch --index-url https://download.pytorch.org/whl/cu126`.
+
+`nested.py` runs one process per CPU, each with its own copy of the model: allow about 0.5 GB of memory per CPU.
 
 ## Quick start
 
@@ -78,6 +84,8 @@ About half the parameters are constrained.
 # name, prior lower, prior upper, benchmark θ*, unit, description
 ("log_g", 3.0, 5.0, 3.75, "log10 cm/s²", "surface gravity"),
 ```
+
+Then run `python tools/make_parameters_md.py` to update PARAMETERS.md (a test checks it is up to date).
 
 **Noise** is Gaussian, with the same σ in every bin: S/N ≈ 30 at the brightest point of the benchmark spectrum.
 
@@ -170,7 +178,12 @@ small differences.
 | `exomini/model.py` | `Model`: prior, simulation, likelihood, test pairs |
 | `exomini/inference.py` | `NPE`, `fit`, `importance_sampling`, `truncated_prior` |
 | `exomini/runs.py` | run folders, shared script options |
-| `exomini/data/` | the test pairs (`tests/make_test_pairs.py`) |
+| `exomini/data/` | the test pairs |
 | `*.py` | the scripts; `reproduce.sh` reruns the exo6 example |
 | `results/` | the exo6 example |
 | `tests/` | models, inference, scripts end to end |
+| `tools/` | regenerate `PARAMETERS.md` and the test pairs after changing a model |
+
+## License
+
+BSD 3-Clause, see [LICENSE](LICENSE).
