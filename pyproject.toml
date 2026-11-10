@@ -1,0 +1,21 @@
+[project]
+name = "toysbi"
+version = "0.1.0"
+description = "Simulation-based inference on toy exoplanet emission spectra"
+requires-python = ">=3.10"
+dependencies = ["numpy", "scipy", "matplotlib", "torch>=2.1", "zuko>=1.1", "dynesty>=2.1"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["toysbi"]
+package-data = {toysbi = ["data/*.npz"]}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
